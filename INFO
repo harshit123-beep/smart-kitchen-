@@ -1,0 +1,124 @@
+API Documentation
+Authentication
+bash
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh-token
+Device Control
+bash
+GET  /api/devices                 # List all devices
+POST /api/devices                 # Create device
+PUT  /api/devices/:id             # Update device
+POST /api/devices/:id/control     # Control device (on/off, temperature, etc)
+GET  /api/devices/:id/status      # Get device status
+Orders
+bash
+GET  /api/orders                  # List orders
+POST /api/orders                  # Create order
+PUT  /api/orders/:id              # Update order status
+GET  /api/orders/:id/tracking     # Track order
+POST /api/orders/:id/complete     # Mark as complete
+Inventory
+bash
+GET  /api/inventory               # List inventory
+PUT  /api/inventory/:id           # Update stock
+GET  /api/inventory/forecast      # Get AI forecast
+POST /api/inventory/restock-alert # Trigger restock
+Analytics
+bash
+GET  /api/analytics/dashboard     # Dashboard data
+GET  /api/analytics/sales         # Sales analytics
+GET  /api/analytics/efficiency    # Equipment efficiency
+GET  /api/analytics/waste         # Waste prediction
+Full API docs: API.md
+
+🏛️ MQTT Topic Structure
+Code
+kitchen/{kitchen_id}/
+├── device/{device_id}/
+│   ├── status              # Device status (on/off, temperature, etc)
+│   ├── control             # Commands to device
+│   ├── telemetry           # Sensor data
+│   └── error               # Error messages
+├── order/
+│   ├── new                 # New orders
+│   ├── update              # Order status updates
+│   └── complete            # Order completed
+├── inventory/
+│   ├── alert               # Low stock alerts
+│   ├── forecast            # Forecast updates
+│   └── expiry              # Expiry warnings
+└── staff/
+    ├── attendance          # Attendance data
+    ├── tasks               # Task assignments
+    └── schedule            # Shift schedule
+See MQTT_TOPICS.md for complete reference.
+
+🔄 CI/CD Pipelines
+GitHub Actions Workflows
+Backend CI - Lint, Test, Build
+
+Trigger: Push to main, develop
+Test Coverage: >80%
+Firmware CI - PlatformIO Build & Test
+
+Verify ESP32 compilation
+Run unit tests
+Mobile CI - React Native Build
+
+Android APK build
+iOS IPA build
+Expo publish
+Docker Build - Multi-image builds
+
+Backend API
+AI Service
+MQTT Broker
+Website
+Code Quality - ESLint, SonarQube
+
+Code standards enforcement
+Coverage reports
+Security Scan - OWASP, Dependabot
+
+Vulnerability detection
+Dependency audit
+See workflows in .github/workflows/
+
+🤝 Contributing
+We welcome contributions! Please read CONTRIBUTING.md for guidelines.
+
+Development Setup
+bash
+# Fork & clone
+git clone https://github.com/YOUR_USERNAME/smart-kitchen-iot.git
+cd smart-kitchen-iot
+
+# Create feature branch
+git checkout -b feature/your-feature
+
+# Make changes & commit
+git commit -m "Add awesome feature"
+
+# Push & create PR
+git push origin feature/your-feature
+📄 License
+This project is licensed under the MIT License - see LICENSE file for details.
+
+📞 Support & Contact
+Issues: GitHub Issues
+Discussions: GitHub Discussions
+Email: support@smartkitcheniot.com
+Website: smartkitcheniot.com
+🗺️ Roadmap
+ Phase 1: Core device control & MQTT integration
+ Phase 2: Mobile app & Web dashboard
+ Phase 3: AI inventory & forecasting
+ Phase 4: Quality detection & computer vision
+ Phase 5: Multi-kitchen chain management
+ Phase 6: Voice assistant integration
+ Phase 7: Advanced analytics & reporting
+📊 Project Stats
+Commits: ![GitHub commits](https://img.shields.io/github/commits-since/harshit123-beep/smart-kitchen-iot/v0.0.1?style=flat-square)
+Stars: ![GitHub stars](https://img.shields.io/github/stars/harshit123-beep/smart-kitchen-iot?style=flat-square)
+Forks: ![GitHub forks](https://img.shields.io/github/forks/harshit123-beep/smart-kitchen-iot?style=flat-square)
