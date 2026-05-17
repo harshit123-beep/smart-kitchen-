@@ -1,0 +1,106 @@
+ARCHITECTURE.md
+
+md
+# Architecture Overview
+
+## System Architecture
+
+┌────────────────────────────────────────────────────────────────┐ │ Client Layer │ │ ┌─────────────────┐ ┌──────────────┐ ┌─────────────────┐ │ │ │ Mobile App │ │ Web PWA │ │ KDS Terminal │ │ │ │ (React Native) │ │ (Next.js) │ │ (Web-based) │ │ │ └────────┬────────┘ └──────┬───────┘ └────────┬────────┘ │ └───────────┼──────────────────┼──────────────────┼──────────────┘ │ │ │ ┌───────┴──────────────────┴──────────────────┴────────┐ │ REST API / WebSocket Layer │ │ (Express.js Backend) │ └───────┬──────────────────┬──────────────────────────┘ │ │ ┌───────▼──────┐ ┌────────▼──────────┐ │ Auth Service │ │ WebSocket Server │ │ (JWT/OAuth) │ │ (Socket.io) │ └───────┬──────┘ └────────┬──────────┘ │ │ ┌───────┴──────────────────┴────────────────────────────┐ │ Core Service Layer │ │ ┌───────────┐ ┌──────────┐ ┌──────────────────────┐ │ │ │ Device │ │ Order │ │ Inventory │ │ │ │ Service │ │ Service │ │ Service │ │ │ └─────┬─────┘ └────┬─────┘ └────────┬─────────────┘ │ │ │ │ │ │ │ ┌─────▼─────┐ ┌────▼─────┐ ┌──────▼─────┐ │ │ │ Analytics│ │Notification│ Staff │ │ │ │ Service │ │ Service │ Service │ │ │ └───────────┘ └───────────┘ └────────────┘ │ └────────┬──────────────────────────────────────────────┘ │ ┌────────┴────────────────────────────────────────────┐ │ Message & Event Handling Layer │ │ ┌───────────────────┐ ┌───────────────────────┐ │ │ │ MQTT Broker │ │ Job Queue (Bull) │ │ │ │ (Mosquitto) │ │ (Redis) │ │ │ └─────────┬─────────┘ └───────┬───────────────┘ │ └────────────┼──────────────────────┼────────────────┘ │ │ ┌────────────▼─────────────────────▼──────────────┐ │ Data Persistence Layer │ │ ┌──────────────┐ ┌──────────────────────────┐│ │ │ PostgreSQL │ │ Redis Cache / Store ││ │ │ (Primary) │ │ (Session, Real-time) ││ │ └──────────────┘ └──────────────────────────┘│ └──────────────────────────────────────────────────┘ │ ┌────────▼────────────────────────────────────────┐ │ IoT Device Layer (MQTT Publish) │ │ ┌─────────┐ ┌────────┐ ┌──────────┐ │ │ │ ESP32 │ │ ESP32 │ │ ESP32 │ │ │ │Cooker │ │ Fridge │ │ Sensors │ │ │ │Control │ │ Temp │ │ (Weight, │ │ │ └────┬────┘ │Monitor │ │ Gas) │ │ │ │ └───┬────┘ └────┬─────┘ │ │ ┌────▼──────────▼───────────▼────┐ │ │ │ Hardware Actuators & Sensors │ │ │ │ - Relays, PWM Signals │ │ │ │ - Temperature Sensors (DHT11)│ │ │ │ - Weight Sensors (HX711) │ │ │ └─────────────────────────────────┘ │ └──────────────────────────────────────────────────┘ │ ┌────────▼────────────────────────────────────────┐ │ External Integrations │ │ ┌──────────┐ ┌─────────────┐ ┌────────────┐ │ │ │ POS API │ │ Delivery │ │ WhatsApp │ │ │ │(Zomato, │ │ APIs (Uber, │ │ / Email │ │ │ │ Swiggy) │ │ Dunzo) │ │ Alerts │ │ │ └──────────┘ └─────────────┘ └────────────┘ │ │ │ │ ┌──────────────┐ ┌────────────────────────┐ │ │ │ Cloud Storage│ │ Analytics & ML Models │ │ │ │ (S3, GCS) │ │ (AI Service - Python) │ │ │ └──────────────┘ └────────────────────────┘ │ └──────────────────────────────────────────────────┘
+
+Code
+
+## Component Interaction Flow
+
+### 1. Device Control Flow
+Mobile App → REST API → Device Service → MQTT Broker → ESP32 → Hardware ↓ ↓ ↓ ↓ ↓ User Validate & Update Publish to Subscribe Execute Initiates Process Database Topic & Execute Action Action Request Update Control Command (Relay/PWM) ↓ Confirmation Feedback ← ← ← WebSocket/Push
+
+Code
+
+### 2. Real-time Monitoring Flow
+Hardware Sensors → ESP32 → MQTT Publish → Backend Service → Cache Update ↓ ↓ ↓ Process Data Store in DB Broadcast to Connected Clients ↓ Alert/Notification Service (WhatsApp, Email, Push)
+
+Code
+
+### 3. Order Processing Flow
+POS System → REST API → Order Service → Job Queue → Inventory Check ↓ ↓ ↓ ↓ ↓ New Order Validate & Create Enqueue for AI Forecast Received Store Order Record Processing & Stock Check ↓ ↓ ↓ WebSocket Push MQTT Topic Kitchen to Kitchen Notification Display (KDS) ↓ Update Device Trigger (Auto-prep items)
+
+Code
+
+### 4. Inventory Automation Flow
+Daily Sales Data → AI Service → Demand Forecast → Low Stock Alerts ↓ ↓ ↓ ↓ Historical Process with Generate Notify Sales Data ML Models Predictions → Auto-create & Alerts → PO → Google Sheets → ERP Integration
+
+Code
+
+### 5. AI Quality Detection Flow
+Kitchen Camera → Computer Vision → Object Detection → Quality Analysis ↓ ↓ ↓ Process Image YOLOv8 Model Check: with OpenCV & CNN - Burnt food Classification - Portion size - Missing items ↓ Quality Score ↓ Feedback to Kitchen Staff Alert if Quality Issue Update Analytics
+
+Code
+
+## Technology Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Frontend** | React Native, Next.js (PWA), Expo | Mobile & Web UI |
+| **Backend** | Node.js, Express.js, TypeScript | REST APIs, Business Logic |
+| **IoT** | ESP32, Arduino, PlatformIO | Device Control & Sensing |
+| **Message Bus** | MQTT (Mosquitto), Socket.io | Real-time Communication |
+| **Database** | PostgreSQL, MongoDB, Redis | Persistence & Caching |
+| **AI/ML** | Python, TensorFlow, YOLOv8, OpenCV | Intelligence & Detection |
+| **Cloud** | AWS/GCP/Azure | Hosting & Services |
+| **Monitoring** | Prometheus, Grafana, ELK Stack | Observability |
+| **CI/CD** | GitHub Actions, Docker | Automation & Deployment |
+
+## Data Flow Patterns
+
+### Publish-Subscribe (MQTT)
+- ESP32 devices publish sensor data to MQTT topics
+- Backend subscribes to device topics for real-time updates
+- Frontend receives updates via WebSocket/Server-Sent Events
+
+### Request-Response (REST API)
+- Mobile app makes REST calls for CRUD operations
+- Backend validates, processes, stores data
+- Returns JSON responses with status codes
+
+### Job Queue (Bull/Redis)
+- Long-running tasks enqueued (AI analysis, bulk exports)
+- Workers process tasks asynchronously
+- Results stored and notified via WebSocket
+
+### Broadcast (WebSocket)
+- Server-to-client real-time updates
+- Kitchen display updates
+- Alert notifications
+- Live analytics dashboard
+
+## Deployment Architecture
+
+### Development
+Local Machine ├── Docker Compose (All services) ├── PostgreSQL (Container) ├── MQTT Broker (Container) ├── Backend API (Node) ├── AI Service (Python) └── Frontend (Dev Server)
+
+Code
+
+### Staging
+AWS/GCP ├── ECS/GKE (Kubernetes) ├── RDS (PostgreSQL) ├── ElastiCache (Redis) ├── MQTT Service (AWS IoT / Self-hosted) ├── S3 (File Storage) └── CloudWatch (Monitoring)
+
+Code
+
+### Production
+AWS/GCP (High Availability) ├── ECS/EKS (Auto-scaling) ├── Multi-AZ RDS ├── Distributed Redis ├── Managed MQTT Service ├── CDN (CloudFront / CloudFlare) ├── Load Balancer (ALB/NLB) └── Comprehensive Monitoring & Alerts
+
+Code
+
+## Security Architecture
+
+┌─────────────────────────────────────────┐ │ API Gateway / Load Balancer │ │ - SSL/TLS Termination │ │ - Rate Limiting │ │ - DDoS Protection │ └────────────────┬────────────────────────┘ │ ┌────────────────▼────────────────────────┐ │ JWT/OAuth Authentication │ │ - Token Validation │ │ - Role-Based Access Control │ └────────────────┬────────────────────────┘ │ ┌────────────────▼────────────────────────┐ │ Application Layer Security │ │ - Input Validation │ │ - SQL Injection Prevention │ │ - CORS Configuration │ └────────────────┬────────────────────────┘ │ ┌────────────────▼────────────────────────┐ │ Data Layer Security │ │ - Encrypted Fields │ │ - Row-Level Security (RLS) │ │ - Database Access Control │ └─────────────────────────────────────────┘
+
+IoT Security: ├── Device Authentication (Certificate-based) ├── MQTT ACLs & Topic Authorization ├── OTA Firmware Verification └── Secure Boot on ESP32
+
+Code
+
+---
+
+**See also**: [SETUP.md](./SETUP.md), [API.md](./API.md), [MQTT_TOPICS.md](./MQTT_TOPICS.md), [SECURITY.md](../docs/SECURITY.md)
+
+Please confirm you want Copilot to make this change in the harshit123-beep/smart-kitchen-iot repository on the default branch.
+
