@@ -93,5 +93,47 @@
 - Models: YOLOv8, OpenCV, CNN
 
 ---
+Features Breakdown
+Feature 1️⃣: Smart Order Management
+✅ Food delivery app integration (Zomato, Swiggy, UberEats)
+✅ POS system connectivity
+✅ Kitchen Display System (KDS) real-time sync
+✅ Automatic delivery partner notifications
+API Endpoints: /api/orders, /api/kds
+Feature 2️⃣: AI Inventory Automation
+✅ Daily sales analysis
+✅ AI-powered demand forecasting
+✅ Auto-generated purchase orders
+✅ Expiry tracking & alerts
+Integration: Google Sheets, ERP, Barcode scanners
+Service: ai-service/inventory_forecasting.py
+Feature 3️⃣: Kitchen Monitoring
+✅ Real-time IoT sensors (temperature, gas, power)
+✅ Automated WhatsApp/Email/Push alerts
+✅ Equipment auto-shutdown
+MQTT Topics: /kitchen/temperature, /kitchen/gas, /kitchen/power
+Feature 4️⃣: AI Customer Analytics
+✅ Personalized food recommendations
+✅ Combo offer generation
+✅ Automated coupon delivery
+Service: ai-service/recommendation_engine.py
+Feature 5️⃣: AI Cooking Assistant
+✅ Voice-controlled recipe guidance
+✅ Smart timer automation
+✅ Ingredient substitution suggestions
+✅ Nutritional analysis
+Tech Stack: Speech recognition + LLM APIs
+Feature 6️⃣: Staff & Operations Automation
+✅ Automated shift scheduling
+✅ Attendance & task tracking
+✅ Hygiene checklist reminders
+Integrations: Slack, WhatsApp, Google Calendar
+Feature 7️⃣: AI Food Quality Inspection
+✅ Computer vision detection (burnt food, portion size, missing items)
+✅ Hygiene violation alerts
+✅ Real-time quality feedback
+Models: YOLOv8, OpenCV, CNN
+Service: ai-service/quality_detection.py
+
 
 ## 🏗️ Technical Architecture
