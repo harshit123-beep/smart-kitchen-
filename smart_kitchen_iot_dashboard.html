@@ -1,0 +1,248 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:99px;font-weight:500}
+.badge-ok{background:var(--color-background-success);color:var(--color-text-success)}
+.badge-warn{background:var(--color-background-warning);color:var(--color-text-warning)}
+.badge-alert{background:var(--color-background-danger);color:var(--color-text-danger)}
+.badge-info{background:var(--color-background-info);color:var(--color-text-info)}
+.device-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.device-row:last-child{border-bottom:none;padding-bottom:0}
+.device-icon{width:34px;height:34px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.device-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.device-meta{font-size:11px;color:var(--color-text-secondary)}
+.toggle{position:relative;width:34px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:100%;height:100%;position:absolute;cursor:pointer;z-index:2;margin:0}
+.toggle-track{position:absolute;inset:0;background:var(--color-border-secondary);border-radius:10px;transition:background .2s}
+.toggle input:checked~.toggle-track{background:#1D9E75}
+.toggle-knob{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
+.toggle input:checked~.toggle-knob{transform:translateX(14px)}
+.inv-bar-bg{height:6px;background:var(--color-border-tertiary);border-radius:3px;margin-top:4px}
+.inv-bar{height:6px;border-radius:3px;transition:width .4s}
+.role-pill{font-size:11px;padding:2px 8px;border-radius:99px;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary)}
+.alert-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.alert-row:last-child{border-bottom:none;padding-bottom:0}
+.alert-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.tab{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:99px;cursor:pointer;color:var(--color-text-secondary);background:var(--color-background-primary)}
+.tab.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:transparent}
+.mini-btn{font-size:12px;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary)}
+.mini-btn:hover{background:var(--color-background-secondary)}
+.progress-ring{transform:rotate(-90deg)}
+</style>
+
+<h2 class="sr-only" style="position:absolute;left:-9999px">Smart Kitchen IoT dashboard — devices, inventory, alerts, and user roles</h2>
+
+<div style="padding:0 0 1.5rem">
+
+<!-- Header -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+  <div>
+    <div style="font-size:18px;font-weight:500;color:var(--color-text-primary)">Kitchen OS <span style="font-size:12px;font-weight:400;color:var(--color-text-tertiary);margin-left:6px">Cloud Kitchen · Bengaluru</span></div>
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">ESP RainMaker · MQTT connected · <span style="color:var(--color-text-success)">● Live</span></div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <span class="role-pill">👤 Chef view</span>
+    <span class="badge badge-ok">All systems normal</span>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div style="display:flex;gap:6px;margin-bottom:1.25rem" id="tabs">
+  <button class="tab active" onclick="showTab('devices')">Devices</button>
+  <button class="tab" onclick="showTab('inventory')">Inventory</button>
+  <button class="tab" onclick="showTab('alerts')">Alerts <span id="alert-badge" style="background:var(--color-background-danger);color:var(--color-text-danger);font-size:10px;padding:1px 5px;border-radius:99px;margin-left:3px">2</span></button>
+  <button class="tab" onclick="showTab('roles')">Access</button>
+</div>
+
+<!-- DEVICES TAB -->
+<div id="tab-devices">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem">
+    <div class="metric"><div class="metric-label">Active devices</div><div class="metric-val" id="active-count">4</div><div class="metric-sub">of 6 online</div></div>
+    <div class="metric"><div class="metric-label">Avg temp (cold)</div><div class="metric-val">3.2°C</div><div class="metric-sub">Target ≤4°C</div></div>
+    <div class="metric"><div class="metric-label">Power draw</div><div class="metric-val" id="power-val">2.4 kW</div><div class="metric-sub">Current load</div></div>
+    <div class="metric"><div class="metric-label">OTA updates</div><div class="metric-val">2</div><div class="metric-sub">Pending push</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Kitchen devices</div>
+    <div id="device-list"></div>
+  </div>
+
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="mini-btn" onclick="scheduleAll()"><i class="ti ti-clock" aria-hidden="true"></i> Schedule routine</button>
+    <button class="mini-btn" onclick="pushOTA()"><i class="ti ti-upload" aria-hidden="true"></i> Push OTA update</button>
+    <button class="mini-btn" onclick="logView()"><i class="ti ti-chart-bar" aria-hidden="true"></i> View logs</button>
+  </div>
+</div>
+
+<!-- INVENTORY TAB -->
+<div id="tab-inventory" style="display:none">
+  <div class="card">
+    <div class="section-label">Ingredient stock levels</div>
+    <div id="inv-list"></div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px">
+    <button class="mini-btn" onclick="autoPO()"><i class="ti ti-refresh" aria-hidden="true"></i> Auto-generate PO</button>
+    <button class="mini-btn" onclick="aiDemand()"><i class="ti ti-star" aria-hidden="true"></i> AI demand forecast ↗</button>
+  </div>
+</div>
+
+<!-- ALERTS TAB -->
+<div id="tab-alerts" style="display:none">
+  <div class="card">
+    <div class="section-label">Recent alerts</div>
+    <div id="alert-list"></div>
+  </div>
+</div>
+
+<!-- ROLES TAB -->
+<div id="tab-roles" style="display:none">
+  <div class="card">
+    <div class="section-label">Role-based access</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:8px" id="role-list"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const devices = [
+  {name:"Smart Cooker A",icon:"🍲",iconBg:"#FAECE7",status:"on",temp:"185°C",role:"Cooking"},
+  {name:"Refrigerator #1",icon:"❄️",iconBg:"#E6F1FB",status:"on",temp:"3.2°C",role:"Cold storage"},
+  {name:"Oven Unit B",icon:"🔥",iconBg:"#FAEEDA",status:"on",temp:"220°C",role:"Baking"},
+  {name:"Ferment Chamber",icon:"🧪",iconBg:"#E1F5EE",status:"on",temp:"28°C",role:"Fermentation"},
+  {name:"Gas Stove Burner",icon:"🫕",iconBg:"#FAECE7",status:"off",temp:"—",role:"Prep"},
+  {name:"IoT Weight Sensor",icon:"⚖️",iconBg:"#EEEDFE",status:"on",temp:"—",role:"Inventory"},
+];
+let devStates = devices.map(d=>d.status==="on");
+
+function renderDevices(){
+  const el = document.getElementById("device-list");
+  let html="",active=0;
+  devices.forEach((d,i)=>{
+    const on = devStates[i];
+    if(on) active++;
+    html+=`<div class="device-row">
+      <div class="device-icon" style="background:${d.iconBg}">${d.icon}</div>
+      <div style="flex:1">
+        <div class="device-name">${d.name}</div>
+        <div class="device-meta">${d.role} · ${on?d.temp:"offline"}</div>
+      </div>
+      <span class="badge ${on?"badge-ok":"badge-info"}" style="margin-right:8px">${on?"on":"off"}</span>
+      <label class="toggle" aria-label="Toggle ${d.name}">
+        <input type="checkbox" ${on?"checked":""} onchange="toggleDev(${i},this.checked)">
+        <div class="toggle-track"></div>
+        <div class="toggle-knob"></div>
+      </label>
+    </div>`;
+  });
+  el.innerHTML=html;
+  document.getElementById("active-count").textContent=active;
+  const kw=(active*0.6).toFixed(1);
+  document.getElementById("power-val").textContent=kw+" kW";
+}
+
+function toggleDev(i,v){
+  devStates[i]=v;
+  renderDevices();
+}
+
+const ingredients=[
+  {name:"Basmati Rice",pct:82,unit:"42 kg",thresh:20,color:"#1D9E75"},
+  {name:"Tomato Puree",pct:18,unit:"3.6 L",thresh:20,color:"#E24B4A"},
+  {name:"Paneer",pct:55,unit:"11 kg",thresh:25,color:"#1D9E75"},
+  {name:"Cooking Oil",pct:30,unit:"9 L",thresh:25,color:"#BA7517"},
+  {name:"Cardamom",pct:12,unit:"120 g",thresh:20,color:"#E24B4A"},
+  {name:"Wheat Flour",pct:70,unit:"28 kg",thresh:20,color:"#1D9E75"},
+];
+
+function renderInventory(){
+  const el=document.getElementById("inv-list");
+  let html="";
+  ingredients.forEach(inv=>{
+    const warn=inv.pct<=inv.thresh;
+    html+=`<div style="padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${inv.name}</span>
+        <span class="badge ${warn?"badge-alert":"badge-ok"}">${warn?"⚠ Low":"OK"}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="inv-bar-bg" style="flex:1"><div class="inv-bar" style="width:${inv.pct}%;background:${inv.color}"></div></div>
+        <span style="font-size:12px;color:var(--color-text-secondary);min-width:44px;text-align:right">${inv.unit}</span>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+const alerts=[
+  {level:"alert",dot:"#E24B4A",title:"Tomato Puree stock critical",msg:"18% remaining · Auto PO triggered · ETA 2h",time:"2 min ago"},
+  {level:"alert",dot:"#E24B4A",title:"Cardamom below threshold",msg:"120g remaining · Restock needed",time:"14 min ago"},
+  {level:"warn",dot:"#BA7517",title:"Oven Unit B temperature spike",msg:"Peaked at 238°C · Normalised",time:"42 min ago"},
+  {level:"ok",dot:"#1D9E75",title:"OTA pushed to Cooker A",msg:"Firmware v2.1.4 installed successfully",time:"1h ago"},
+  {level:"info",dot:"#185FA5",title:"Chef login: Priya R.",msg:"Role: Chef · Device access active",time:"3h ago"},
+];
+
+function renderAlerts(){
+  const el=document.getElementById("alert-list");
+  let html="";
+  alerts.forEach(a=>{
+    html+=`<div class="alert-row">
+      <div class="alert-dot" style="background:${a.dot}"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${a.title}</div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">${a.msg}</div>
+      </div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);white-space:nowrap;margin-left:8px">${a.time}</div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+const roles=[
+  {role:"Owner",color:"#534AB7",bg:"#EEEDFE",perms:["Full device control","Logs & analytics","Role management","OTA push","POS integration"]},
+  {role:"Chef",color:"#0F6E56",bg:"#E1F5EE",perms:["Control cookers & ovens","View temp alerts","Inventory view","Schedule routines"]},
+  {role:"Maintenance",color:"#854F0B",bg:"#FAEEDA",perms:["View device health","Trigger diagnostics","Receive fault alerts","Read-only logs"]},
+];
+
+function renderRoles(){
+  const el=document.getElementById("role-list");
+  let html="";
+  roles.forEach(r=>{
+    html+=`<div class="card" style="border-color:${r.color}33">
+      <div style="font-size:14px;font-weight:500;color:${r.color};margin-bottom:8px;padding:4px 10px;background:${r.bg};border-radius:var(--border-radius-md);display:inline-block">${r.role}</div>
+      <ul style="list-style:none;padding:0;margin:0">
+        ${r.perms.map(p=>`<li style="font-size:12px;color:var(--color-text-secondary);padding:3px 0;display:flex;gap:6px"><span style="color:${r.color}">✓</span>${p}</li>`).join("")}
+      </ul>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function showTab(id){
+  ["devices","inventory","alerts","roles"].forEach(t=>{
+    document.getElementById("tab-"+t).style.display=t===id?"block":"none";
+  });
+  document.querySelectorAll(".tab").forEach((b,i)=>{
+    b.classList.toggle("active",["devices","inventory","alerts","roles"][i]===id);
+  });
+}
+
+function scheduleAll(){alert("Scheduled cooking routine set for 06:30 AM via REST+MQTT.")}
+function pushOTA(){alert("OTA update queued for 2 devices. Will deploy during next idle window.")}
+function logView(){sendPrompt("Show me an example of what ESP32 cloud device logs look like for a smart kitchen")}
+function autoPO(){alert("Purchase order auto-created for: Tomato Puree (10L), Cardamom (500g). Sent to ERP.")}
+function aiDemand(){sendPrompt("Explain how AI demand forecasting works for smart kitchen inventory management ↗")}
+
+renderDevices();
+renderInventory();
+renderAlerts();
+renderRoles();
+</script>
