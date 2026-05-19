@@ -136,4 +136,3 @@ Models: YOLOv8, OpenCV, CNN
 Service: ai-service/quality_detection.py
 
 
-## 🏗️ Technical Architecture
